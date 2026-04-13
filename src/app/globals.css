@@ -1,0 +1,262 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --board-light: #F0D9B5;
+  --board-dark: #B58863;
+  --board-selected: rgba(20, 85, 30, 0.75);
+  --board-move: rgba(20, 85, 30, 0.5);
+  --board-last: rgba(205, 210, 106, 0.7);
+  --board-check: rgba(200, 0, 0, 0.6);
+  --gold: #D4AF37;
+  --gold-light: #F5D97F;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-crimson), 'Georgia', serif;
+  background: radial-gradient(ellipse at 50% 0%, #2d1a0a 0%, #0d0600 70%);
+  min-height: 100vh;
+}
+
+/* Chess board */
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+}
+
+.chess-square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: filter 0.1s ease;
+  aspect-ratio: 1;
+}
+
+.chess-square:hover {
+  filter: brightness(1.1);
+}
+
+.chess-square.light { background-color: var(--board-light); }
+.chess-square.dark  { background-color: var(--board-dark); }
+
+.chess-square.selected { background-color: var(--board-selected) !important; }
+.chess-square.last-move { background-color: var(--board-last) !important; }
+.chess-square.in-check  { background-color: var(--board-check) !important; }
+
+/* Move hints */
+.move-dot::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: rgba(20, 85, 30, 0.6);
+  pointer-events: none;
+}
+
+.capture-ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 5px rgba(20, 85, 30, 0.6);
+  pointer-events: none;
+}
+
+/* Chess pieces */
+.chess-piece {
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  transition: transform 0.15s ease;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.5); }
+
+/* Gold shimmer text */
+.gold-text {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5D97F 40%, #D4AF37 60%, #b8860b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Panel glass effect */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+/* Difficulty button active state */
+.diff-active {
+  border-color: var(--gold) !important;
+  background: rgba(212, 175, 55, 0.1) !important;
+}
+
+/* Thinking animation */
+@keyframes thinking-dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+.thinking-dots::after {
+  content: '...';
+  animation: thinking-dots 1.5s infinite;
+}
+
+/* Board coordinates */
+.board-coord {
+  font-family: var(--font-cinzel), serif;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.6;
+  position: absolute;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* Move list */
+.move-item:nth-child(even) {
+  background: rgba(255,255,255,0.02);
+}
+
+/* Evaluation bar */
+.eval-bar {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animation classes */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-in { animation: slideInRight 0.4s ease-out; }
+.animate-fade-up { animation: fadeInUp 0.5s ease-out; }
+
+/* Responsive board */
+@media (max-width: 768px) {
+  .chess-piece { font-size: clamp(20px, 7vw, 40px); }
+}
+
+/* ============================
+   GAME OVER MODAL ANIMATIONS
+   ============================ */
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7) translateY(40px);
+  }
+  60% {
+    transform: scale(1.04) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-in {
+  animation: modalIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  50%  { transform: scale(1.2) rotate(5deg); }
+  75%  { transform: scale(0.95) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 0.6; }
+  100% {
+    transform: translateY(-120px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-float-particle {
+  animation: floatParticle linear infinite;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(500px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confettiFall linear infinite;
+}
+
+/* Shimmer effect for win title */
+@keyframes goldShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    #D4AF37 0%,
+    #F5D97F 25%,
+    #D4AF37 50%,
+    #F5D97F 75%,
+    #D4AF37 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 3s linear infinite;
+}
+
+/* Pulsing glow for lose state */
+@keyframes redPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(220,38,38,0.4); }
+  50% { box-shadow: 0 0 50px rgba(220,38,38,0.7), 0 0 80px rgba(220,38,38,0.3); }
+}
+
+.animate-red-pulse {
+  animation: redPulse 2s ease-in-out infinite;
+}
