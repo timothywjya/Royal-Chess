@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Chess } from 'chess.js';
+import { Chess, Square } from 'chess.js';
 import ChessSquareComponent from './ChessSquare';
 import { useGameStore } from '@/hooks/useGameStore';
 import { FILES, RANKS } from '@/lib/constants';
@@ -15,8 +15,11 @@ export default function ChessBoard() {
     lastMove, inCheck, kingSquare, selectSquare,
   } = useGameStore();
 
+  // 1. Memoize instance chess berdasarkan FEN
   const chess = useMemo(() => new Chess(fen), [fen]);
-  const board = chess.board();
+  
+  // 2. Memoize board agar tidak berubah-ubah referensinya jika FEN tetap
+  const board = useMemo(() => chess.board(), [chess]);
 
   const squares = useMemo(() => {
     const files = isFlipped ? [...FILES].reverse() : FILES;
@@ -27,7 +30,7 @@ export default function ChessBoard() {
       for (let fi = 0; fi < 8; fi++) {
         const file = files[fi];
         const rank = ranks[ri];
-        const sq = file + rank;
+        const sq = (file + rank) as Square; // Cast ke Square agar type-safe
         const boardRank = 8 - parseInt(rank);
         const boardFile = file.charCodeAt(0) - 97;
         const rawPiece = board[boardRank][boardFile];
@@ -40,15 +43,16 @@ export default function ChessBoard() {
           isLastMove: !!(lastMove && (lastMove.from === sq || lastMove.to === sq)),
           isLegalTarget: legalMovesFrom.includes(sq),
           isInCheck: inCheck && kingSquare === sq,
-          showRankLabel: fi === 0,
-          showFileLabel: ri === 7,
+          showRankLabel: fi === (isFlipped ? 7 : 0), // Label menyesuaikan flip
+          showFileLabel: ri === (isFlipped ? 0 : 7),
           fileLabel: file,
           rankLabel: rank,
         });
       }
     }
     return result;
-  }, [fen, isFlipped, selectedSquare, legalMovesFrom, lastMove, inCheck, kingSquare, board]);
+    // Hapus 'fen' dari sini karena fungsinya sudah diwakili oleh 'board'
+  }, [isFlipped, selectedSquare, legalMovesFrom, lastMove, inCheck, kingSquare, board]);
 
   return (
     <div

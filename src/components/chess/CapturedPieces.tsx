@@ -4,7 +4,6 @@ import { useGameStore } from '@/hooks/useGameStore';
 import { PIECE_UNICODE } from '@/lib/constants';
 import type { PieceType } from '@/types/chess';
 
-const PIECE_ORDER: PieceType[] = ['q', 'r', 'b', 'n', 'p'];
 const PIECE_VALUE: Record<PieceType, number> = { q: 9, r: 5, b: 3, n: 3, p: 1, k: 0 };
 
 function sortPieces(pieces: string[]) {
